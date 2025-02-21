@@ -1,0 +1,34 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+
+# Environment variables
+.env
+
+# Logs and databases
+*.log
+*.sqlite3
+*.db
+
+# Alembic migrations cache
+alembic.ini
+
+# Python dependencies
+*.egg-info/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDE and editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS-specific files
+.DS_Store
+Thumbs.db
