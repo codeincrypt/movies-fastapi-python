@@ -5,10 +5,21 @@ from app.database import Base  # Use Base from database.py
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)  # Ensure autoincrement
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     email = Column(String, unique=True, index=True, nullable=False)
     password = Column(String, nullable=False)
     status = Column(Integer)
+
+
+class Movies(Base):
+    __tablename__ = "movies"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True) 
+    moviename = Column(String, unique=True, index=True, nullable=False)
+    image = Column(String, nullable=False)
+    language = Column(String, nullable=False)
+    status = Column(Integer)
+
 
 class Item(Base):
     __tablename__ = "items"

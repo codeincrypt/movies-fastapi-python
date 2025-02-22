@@ -4,3 +4,5 @@ pydantic
 sqlalchemy
 python-dotenv
 passlib
+psycopg2
+PyJWT
