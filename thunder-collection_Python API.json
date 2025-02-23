@@ -1,0 +1,47 @@
+{
+    "clientName": "Thunder Client",
+    "collectionName": "Python API",
+    "collectionId": "578aab3d-70ec-49cc-a9b4-d9bf22228354",
+    "dateExported": "2025-02-23T18:40:31.980Z",
+    "version": "1.2",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "103fcafa-4298-4e80-b12e-c26c291dee58",
+            "colId": "578aab3d-70ec-49cc-a9b4-d9bf22228354",
+            "containerId": "",
+            "name": "User Register",
+            "url": "http://127.0.0.1:8000/user/register",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2025-02-21T17:59:03.230Z",
+            "modified": "2025-02-21T17:59:03.230Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\r\n  \"username\": \"kartik\",\r\n  \"email\": \"kartik@gmail.com\",\r\n  \"password\": \"123456\"\r\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "10c0d677-5a90-4f1e-946d-f8c8e67d0b67",
+            "colId": "578aab3d-70ec-49cc-a9b4-d9bf22228354",
+            "containerId": "",
+            "name": "Search movie TDB",
+            "url": "http://127.0.0.1:8000/admin/movie?query=moana",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2025-02-23T18:39:55.499Z",
+            "modified": "2025-02-23T18:39:55.499Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "query",
+                    "value": "moana",
+                    "isPath": false
+                }
+            ]
+        }
+    ],
+    "ref": "VvuGj5gMnouGazJuZQLhHCjxy9uePHBnYIBChfovip7IUQG2TCPr36Uxg8bhassfNQUBq7AjahSVF0cCTLt-zg"
+}
