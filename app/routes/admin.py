@@ -22,6 +22,7 @@ def get_users(db: Session = Depends(get_db)):
         return {"status":"0", "message": "User not found"}
     return response
 
+
 @admin_router.get("/users/{user_id}")
 def get_user(user_id: int, db: Session = Depends(get_db)):
     response = db.query(User).filter(User.id == user_id).first()
@@ -32,26 +33,30 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 
 @admin_router.get("/movie")
 def search_movie(query: str = Query(...), db: Session = Depends(get_db)):
-    print("Query:", query)
+    print("search query from admin:", query)
 
     # Search movie in local database
     result = db.query(Movies).filter(Movies.title == query).first()
-    print("-----------Movies", result)
+    print("database result", result)
 
     if not result:
-        url = "https://api.themoviedb.org/3/search/move"
-        params = {"query": query}
+        # Search movie in TMDB API
+        print("Searching in TMDB API")
+        url = "https://api.themoviedb.org/3/search/movie"
+        params = {"query": query, "include_adult": "false", "language": "en-US", "page": 1}
         headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
         
         response = requests.get(url, headers=headers, params=params)
-
+        print("API response", response.json())
         if response.status_code == 200:
             data = response.json()
-            return {"status": "1", "data": data}
+            data["status"] = "1"
+            return data
         else:
             return {"status": "0", "error": response.json()}
     
     return {"status": "1", "data": result}
+
 
 @admin_router.get("/movies")
 def get_movie_list(db: Session = Depends(get_db)):
