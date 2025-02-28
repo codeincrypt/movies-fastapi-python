@@ -2,6 +2,7 @@ from pydantic import BaseModel, EmailStr, UUID4
 from typing import List, Optional
 from datetime import date
 
+# Pydantic Model
 class UserBase(BaseModel):
     email: EmailStr
     family_name: Optional[str] = None
@@ -33,11 +34,12 @@ class ItemResponse(ItemCreate):
     class Config:
         from_attributes  = True
 
+
 class MovieBase(BaseModel):
     adult: bool
     movie_id: int
-    backdrop_path: Optional[str] = None
-    genre_ids: List[int]
+    backdrop_path: str = ""
+    genre_ids: Optional[str] = None
     original_language: str
     original_title: str
     overview: Optional[str] = None

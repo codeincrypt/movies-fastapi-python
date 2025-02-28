@@ -47,7 +47,6 @@ def search_movie(query: str = Query(...), db: Session = Depends(get_db)):
         headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
         
         response = requests.get(url, headers=headers, params=params)
-        print("API response", response.json())
         if response.status_code == 200:
             data = response.json()
             data["status"] = "1"
@@ -77,21 +76,31 @@ def get_movie(movie_id: int, db: Session = Depends(get_db)):
 
 @admin_router.post("/add-movies")
 def add_movies(movie:MovieBase, db: Session = Depends(get_db)):
+    print("add movies payload data", movie)
     try:
         existing_movie = db.query(Movies).filter(Movies.movie_id == movie.movie_id).first()
         if existing_movie:
             return {"status": "0", "message": "Movie already Exists", "data": existing_movie}
+        if movie.backdrop_path == "":
+            backdrop_path = ""
+        else:
+            backdrop_path = MOVIE_IMAGE_URL + movie.backdrop_path
+
+        if movie.poster_path == "":
+            poster_path = ""
+        else:
+            poster_path = MOVIE_IMAGE_URL + movie.poster_path
 
         new_movie = Movies(
             adult=movie.adult,
             movie_id=movie.movie_id,
-            backdrop_path=MOVIE_IMAGE_URL + movie.backdrop_path,
-            genre_ids=movie.genre_ids,  # Assuming genre_ids is stored as JSON
+            backdrop_path=backdrop_path,
+            genre_ids=movie.genre_ids,
             original_language=movie.original_language,
             original_title=movie.original_title,
             overview=movie.overview,
             popularity=movie.popularity,
-            poster_path=MOVIE_IMAGE_URL + movie.poster_path,
+            poster_path=poster_path,
             release_date=movie.release_date,
             title=movie.title,
             video=movie.video,

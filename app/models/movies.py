@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, Boolean, Float, Date
 from sqlalchemy.dialects.postgresql import ARRAY
 from app.database import Base  # Ensure Base is imported from database.py
 
+# SQLAlchemy Model
 class Movies(Base):
     __tablename__ = "movies"
 
@@ -9,7 +10,7 @@ class Movies(Base):
     adult = Column(Boolean, nullable=False, default=False)
     movie_id = Column(Integer, nullable=False)
     backdrop_path = Column(String, nullable=True)
-    genre_ids = Column(ARRAY(Integer), nullable=True)
+    genre_ids = Column(String, nullable=True)
     original_language = Column(String, nullable=False)
     original_title = Column(String, nullable=False)
     overview = Column(String, nullable=True)
