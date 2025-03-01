@@ -1,5 +1,4 @@
 from sqlalchemy import Column, Integer, String, Boolean, Float, Date
-from sqlalchemy.dialects.postgresql import ARRAY
 from app.database import Base  # Ensure Base is imported from database.py
 
 # SQLAlchemy Model

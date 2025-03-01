@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, UUID4
+from pydantic import BaseModel, EmailStr
 from typing import List, Optional
 from datetime import date
 
@@ -7,32 +7,19 @@ class UserBase(BaseModel):
     email: EmailStr
     family_name: Optional[str] = None
     given_name: Optional[str] = None
-    social_id: Optional[str] = None
-    name: Optional[str] = None
+    social_id: str
+    name: str
     picture: Optional[str] = None
-    status: int
-    doc: Optional[str] = None
+    status: Optional[int] = None
 
 class UserCreate(UserBase):
     pass
 
 class UserResponse(UserBase):
     id: int
-    uuid: UUID4
 
     class Config:
         from_attributes = True
-
-class ItemCreate(BaseModel):
-    name: str
-    description: Optional[str] = None
-
-class ItemResponse(ItemCreate):
-    id: int
-    owner_id: int
-
-    class Config:
-        from_attributes  = True
 
 
 class MovieBase(BaseModel):
@@ -59,3 +46,22 @@ class MovieResponse(MovieBase):
 
     class Config:
         from_attributes  = True  # Allows ORM mode
+
+
+class SellerBase(BaseModel):
+    email: EmailStr
+    family_name: Optional[str] = None
+    given_name: Optional[str] = None
+    social_id: str
+    name: str
+    picture: Optional[str] = None
+    status: Optional[int] = None
+
+class SellerCreate(SellerBase):
+    pass
+
+class SellerResponse(SellerBase):
+    id: int
+
+    class Config:
+        from_attributes = True

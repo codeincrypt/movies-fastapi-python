@@ -4,10 +4,10 @@ import requests
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 
-from app.models.user import User
-from app.models.movies import Movies
+from app.schema.user import User
+from app.schema.movies import Movies
 from app.database import get_db
-from app.schemas import MovieBase
+from app.model import MovieBase
 
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 MOVIE_IMAGE_URL = os.getenv("MOVIE_IMAGE_URL")
