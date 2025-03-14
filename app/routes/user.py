@@ -6,7 +6,7 @@ import uuid
 from app import auth
 from app.database import get_db
 from app.schema.user import User
-from app.schema.booking import Booking
+# from app.schema.booking import Booking
 from app.model.users import UserCreate
 
 user_router = APIRouter(prefix="/user", tags=["User"])
@@ -38,9 +38,7 @@ def login(email: str, password: str, db: Session = Depends(get_db)):
 
 @user_router.post("/google-login")
 def google_login(user: UserCreate, db: Session = Depends(get_db)):
-    print("Google login request", user)
     try:
-        # Check if user exists in DB
         db_user = db.query(User).filter(User.email == user.email).first()
 
         if not db_user:
@@ -78,20 +76,20 @@ def google_login(user: UserCreate, db: Session = Depends(get_db)):
         print("Error during Google login:", e)
         raise HTTPException(status_code=400, detail=str(e))
 
-@user_router.post("/my-bookings/")
-def my_bookings(authorization: str = Header(), db: Session = Depends(get_db)):
-    if not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Invalid Authorization header")
+# @user_router.post("/my-bookings/")
+# def my_bookings(authorization: str = Header(), db: Session = Depends(get_db)):
+#     if not authorization.startswith("Bearer "):
+#         raise HTTPException(status_code=401, detail="Invalid Authorization header")
 
-    token = authorization.split(" ")[1]
-    payload = auth.decode_jwt(token)
+#     token = authorization.split(" ")[1]
+#     payload = auth.decode_jwt(token)
     
-    user_id = payload.get("id")
-    if not user_id:
-        raise HTTPException(status_code=401, detail="Invalid token data")
+#     user_id = payload.get("id")
+#     if not user_id:
+#         raise HTTPException(status_code=401, detail="Invalid token data")
 
-    result = db.query(Booking).filter(Booking.user_id == user_id).all()
-    if result:
-        return {"status": "1", "data": result} 
+#     result = db.query(Booking).filter(Booking.user_id == user_id).all()
+#     if result:
+#         return {"status": "1", "data": result} 
     
-    return {"status": "0", "message": "No booking found"}
+#     return {"status": "0", "message": "No booking found"}

@@ -20,5 +20,5 @@ class Seller(Base):
     updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
 
     # Relationships
-    bookings = relationship("Bookings", back_populates="seller")
+    bookings = relationship("Booking", back_populates="seller")
     theatres = relationship("Theatre", back_populates="seller")

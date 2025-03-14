@@ -5,8 +5,13 @@ import uuid
 
 from app import auth
 from app.database import get_db
+
+from app.middleware.auth import get_current_user
+
 from app.schema.seller import Seller
+from app.schema.theatre import Theatre
 from app.schema.booking import Booking
+
 from app.model.sellers import SellerCreate
 
 seller_router = APIRouter(prefix="/seller", tags=["Seller"])
@@ -47,23 +52,37 @@ def google_login(seller: SellerCreate, db: Session = Depends(get_db)):
         return {"status":"1", "message": "Seller Login successful", "token": token, "data": data}
 
     except Exception as e:
-        print("Error during Google login:", e)
+        print("Error during Seller Google login:", e)
         raise HTTPException(status_code=400, detail=str(e))
 
-@seller_router.post("/my-bookings/")
-def my_bookings(authorization: str = Header(), db: Session = Depends(get_db)):
-    if not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Invalid Authorization header")
 
-    token = authorization.split(" ")[1]
-    payload = auth.decode_jwt(token)
+@seller_router.post("/my-bookings")
+def my_bookings(user_details: dict = Depends(get_current_user), db: Session = Depends(get_db)):
+
+    result = db.query(Booking).filter(Booking.seller_id == user_details.id).all()
+    return {"status": "1", "data": result} if result else {"status": "0", "message": "No booking found"}
+
+
+@seller_router.post("/my-theatres")
+def my_theatres(user_details: dict = Depends(get_current_user), db: Session = Depends(get_db)):
     
-    user_id = payload.get("id")
-    if not user_id:
-        raise HTTPException(status_code=401, detail="Invalid token data")
-
-    result = db.query(Booking).filter(Booking.seller_id == user_id).all()  # Fetch all bookings
+    result = db.query(Theatre).filter(Theatre.seller_id == user_id).all()  # Fetch all theatres
     if result:
         return {"status": "1", "data": result} 
     
     return {"status": "0", "message": "No booking found"}
+
+@seller_router.post("/create-theatres")
+def my_theatres(user_details: dict = Depends(get_current_user), db: Session = Depends(get_db)):
+
+    new_theatre = Theatre(
+        name=theatre.name,
+        seller_id=user_details.id,
+        seating_map=theatre.seating_map,
+        location=theatre.location,
+        capacity=theatre.capacity
+    )
+    db.add(new_theatre)
+    db.commit()
+    db.refresh(new_theatre)
+    return {"status": "1", "message": "Theatre created successfully"}

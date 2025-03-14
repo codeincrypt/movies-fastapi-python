@@ -25,6 +25,12 @@ app.add_middleware(
 )
 
 # Create database tables (only if you're not using Alembic)
+from app.schema.movies import Movies
+from app.schema.user import User
+from app.schema.seller import Seller
+from app.schema.theatre import Theatre
+from app.schema.seating import Seating
+from app.schema.booking import Booking
 Base.metadata.create_all(bind=engine)
 
 # Include routers with the correct prefix

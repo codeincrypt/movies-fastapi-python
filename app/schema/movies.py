@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean, Float, Date
-from app.database import Base  # Ensure Base is imported from database.py
+from app.database import Base
 
 # SQLAlchemy Model
 class Movies(Base):
