@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, TIMESTAMP, func
+from sqlalchemy.orm import relationship
 from app.database import Base
 
+# SQLAlchemy Model
 class User(Base):
     __tablename__ = "users"
 
@@ -16,3 +18,6 @@ class User(Base):
     status = Column(Integer, default=1, nullable=False)
     created_at = Column(TIMESTAMP, server_default=func.now())  
     updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
+
+    # Relationships
+    bookings = relationship("Booking", back_populates="user")

@@ -1,13 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import Session
 import uuid
 
-from app import model, auth
+from app import auth
 from app.database import get_db
 from app.schema.seller import Seller
-from app.model import SellerCreate
-from app.auth import create_access_token 
+from app.schema.booking import Booking
+from app.model.sellers import SellerCreate
 
 seller_router = APIRouter(prefix="/seller", tags=["Seller"])
 
@@ -34,7 +34,7 @@ def google_login(seller: SellerCreate, db: Session = Depends(get_db)):
             db_user = new_seller
 
         # Generate JWT token
-        token = create_access_token({"user_id": db_user.uuid, "email": db_user.email})
+        token = auth.create_access_token({"user_id": db_user.uuid, "email": db_user.email})
         data = {
             "email": db_user.email,
             "family_name": db_user.family_name,
@@ -49,3 +49,21 @@ def google_login(seller: SellerCreate, db: Session = Depends(get_db)):
     except Exception as e:
         print("Error during Google login:", e)
         raise HTTPException(status_code=400, detail=str(e))
+
+@seller_router.post("/my-bookings/")
+def my_bookings(authorization: str = Header(), db: Session = Depends(get_db)):
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Invalid Authorization header")
+
+    token = authorization.split(" ")[1]
+    payload = auth.decode_jwt(token)
+    
+    user_id = payload.get("id")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid token data")
+
+    result = db.query(Booking).filter(Booking.seller_id == user_id).all()  # Fetch all bookings
+    if result:
+        return {"status": "1", "data": result} 
+    
+    return {"status": "0", "message": "No booking found"}

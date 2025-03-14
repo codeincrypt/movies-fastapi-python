@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.schema.user import User
 from app.schema.movies import Movies
 from app.database import get_db
-from app.model import MovieBase
+from app.model.movies import MovieBase
 
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 MOVIE_IMAGE_URL = os.getenv("MOVIE_IMAGE_URL")

@@ -1,18 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import Session
 import uuid
 
-from app import model, auth
+from app import auth
 from app.database import get_db
 from app.schema.user import User
-from app.model import UserCreate
-from app.auth import create_access_token 
+from app.schema.booking import Booking
+from app.model.users import UserCreate
 
 user_router = APIRouter(prefix="/user", tags=["User"])
 
 @user_router.post("/register")
-def register(user: model.UserCreate, db: Session = Depends(get_db)):
+def register(user: UserCreate, db: Session = Depends(get_db)):
     try:
         hashed_password = auth.hash_password(user.password)
         db_user = User(email=user.email, password=hashed_password, status=1)
@@ -38,6 +38,7 @@ def login(email: str, password: str, db: Session = Depends(get_db)):
 
 @user_router.post("/google-login")
 def google_login(user: UserCreate, db: Session = Depends(get_db)):
+    print("Google login request", user)
     try:
         # Check if user exists in DB
         db_user = db.query(User).filter(User.email == user.email).first()
@@ -60,7 +61,7 @@ def google_login(user: UserCreate, db: Session = Depends(get_db)):
             db_user = new_user
 
         # Generate JWT token
-        token = create_access_token({"user_id": db_user.uuid, "email": db_user.email})
+        token = auth.create_access_token({"user_id": db_user.uuid, "email": db_user.email})
         data = {
             "email": db_user.email,
             "family_name": db_user.family_name,
@@ -70,8 +71,27 @@ def google_login(user: UserCreate, db: Session = Depends(get_db)):
             "picture": db_user.picture,
             "uuid": db_user.uuid,
         }
+        print("Google login successful", token)
         return {"status":"1", "message": "Login successful", "token": token, "data": data}
 
     except Exception as e:
         print("Error during Google login:", e)
         raise HTTPException(status_code=400, detail=str(e))
+
+@user_router.post("/my-bookings/")
+def my_bookings(authorization: str = Header(), db: Session = Depends(get_db)):
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Invalid Authorization header")
+
+    token = authorization.split(" ")[1]
+    payload = auth.decode_jwt(token)
+    
+    user_id = payload.get("id")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid token data")
+
+    result = db.query(Booking).filter(Booking.user_id == user_id).all()
+    if result:
+        return {"status": "1", "data": result} 
+    
+    return {"status": "0", "message": "No booking found"}
