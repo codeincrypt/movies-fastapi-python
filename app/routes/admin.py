@@ -4,10 +4,12 @@ import requests
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 
-from app.schema.user import User
-from app.schema.movies import Movies
 from app.database import get_db
 from app.model.movies import MovieBase
+
+from app.schema.user import User
+from app.schema.movies import Movies
+from app.schema.seller import Seller
 
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 MOVIE_IMAGE_URL = os.getenv("MOVIE_IMAGE_URL")
@@ -15,7 +17,7 @@ MOVIE_IMAGE_URL = os.getenv("MOVIE_IMAGE_URL")
 admin_router = APIRouter(prefix="/admin", tags=["Admin"])
 
 @admin_router.get("/users")
-def get_users(db: Session = Depends(get_db)):
+def get_user_list(db: Session = Depends(get_db)):
     result = db.query(User).all()
     response = {"status":"1", "users": result} 
     if not response:
@@ -24,7 +26,7 @@ def get_users(db: Session = Depends(get_db)):
 
 
 @admin_router.get("/users/{user_id}")
-def get_user(user_id: int, db: Session = Depends(get_db)):
+def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
     response = db.query(User).filter(User.id == user_id).first()
     if not response:
         return {"status":"0", "message": "Invalid user id"}
@@ -67,7 +69,7 @@ def get_movie_list(db: Session = Depends(get_db)):
 
 
 @admin_router.get("/movies/{movie_id}")
-def get_movie(movie_id: int, db: Session = Depends(get_db)):
+def get_movie_by_id(movie_id: int, db: Session = Depends(get_db)):
     result = db.query(Movies).filter(Movies.movie_id == movie_id).first()
     if result:
         return {"status":"1", "data": result} 
@@ -81,6 +83,7 @@ def add_movies(movie:MovieBase, db: Session = Depends(get_db)):
         existing_movie = db.query(Movies).filter(Movies.movie_id == movie.movie_id).first()
         if existing_movie:
             return {"status": "0", "message": "Movie already Exists", "data": existing_movie}
+        
         if movie.backdrop_path == "":
             backdrop_path = ""
         else:
@@ -119,14 +122,15 @@ def add_movies(movie:MovieBase, db: Session = Depends(get_db)):
 
 
 @admin_router.get("/seller")
-def get_seller(db: Session = Depends(get_db)):
-    result = db.query(User).all()
+def get_sellers(db: Session = Depends(get_db)):
+    result = db.query(Seller).all()
     response = {"status":"1", "users": result} 
     return response
 
 
 @admin_router.get("/seller/{seller_id}")
-def get_users(db: Session = Depends(get_db)):
-    result = db.query(User).all()
-    response = {"status":"1", "users": result} 
-    return response
+def get_seller_by_id(seller_id: str, db: Session = Depends(get_db)):
+    result = db.query(Seller).filter(Seller.id == seller_id).first()
+    if result:
+        return {"status": "1", "data": result}
+    return {"status": "0", "data":{},"message": "No data found"}

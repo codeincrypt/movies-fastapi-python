@@ -5,7 +5,7 @@ from datetime import date
 class MovieBase(BaseModel):
     adult: bool
     movie_id: int
-    backdrop_path: str = ""
+    backdrop_path: Optional[str] = None
     genre_ids: Optional[str] = None
     original_language: str
     original_title: str

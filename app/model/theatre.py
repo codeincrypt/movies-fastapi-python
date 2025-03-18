@@ -1,9 +1,10 @@
 from pydantic import BaseModel
+from typing import Optional
 from datetime import datetime
 
 class TheatreBase(BaseModel):
     name: str
-    seller_id: int
+    seller_id: Optional[int] = None
     seating_map: str
     location: str
     capacity: int

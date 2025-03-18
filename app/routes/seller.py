@@ -3,25 +3,25 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm import Session
 import uuid
 
-from app import auth
 from app.database import get_db
 
-from app.middleware.auth import get_current_user
+from app.middleware.auth import get_current_seller, create_access_token
 
 from app.schema.seller import Seller
 from app.schema.theatre import Theatre
 from app.schema.booking import Booking
 
 from app.model.sellers import SellerCreate
+from app.model.theatre import TheatreCreate
 
 seller_router = APIRouter(prefix="/seller", tags=["Seller"])
 
 @seller_router.post("/google-login")
 def google_login(seller: SellerCreate, db: Session = Depends(get_db)):
     try:
-        db_seller = db.query(Seller).filter(Seller.email == seller.email).first()
+        db_user = db.query(Seller).filter(Seller.email == seller.email).first()
 
-        if not db_seller:
+        if not db_user:
             # Create new seller
             new_seller = Seller(
                 email=seller.email,
@@ -37,9 +37,9 @@ def google_login(seller: SellerCreate, db: Session = Depends(get_db)):
             db.commit()
             db.refresh(new_seller)
             db_user = new_seller
-
+        print("Created seller:", db_user)
         # Generate JWT token
-        token = auth.create_access_token({"user_id": db_user.uuid, "email": db_user.email})
+        token = create_access_token({"user_id": db_user.uuid, "id": db_user.id, "email": db_user.email})
         data = {
             "email": db_user.email,
             "family_name": db_user.family_name,
@@ -57,32 +57,34 @@ def google_login(seller: SellerCreate, db: Session = Depends(get_db)):
 
 
 @seller_router.post("/my-bookings")
-def my_bookings(user_details: dict = Depends(get_current_user), db: Session = Depends(get_db)):
-
+def my_bookings(user_details: dict = Depends(get_current_seller), db: Session = Depends(get_db)):
     result = db.query(Booking).filter(Booking.seller_id == user_details.id).all()
     return {"status": "1", "data": result} if result else {"status": "0", "message": "No booking found"}
 
 
-@seller_router.post("/my-theatres")
-def my_theatres(user_details: dict = Depends(get_current_user), db: Session = Depends(get_db)):
-    
-    result = db.query(Theatre).filter(Theatre.seller_id == user_id).all()  # Fetch all theatres
+@seller_router.get("/my-theatre")
+def my_theatres(user_details: dict = Depends(get_current_seller), db: Session = Depends(get_db)):
+    result = db.query(Theatre).filter(Theatre.seller_id == user_details.id).all()
     if result:
         return {"status": "1", "data": result} 
-    
     return {"status": "0", "message": "No booking found"}
 
-@seller_router.post("/create-theatres")
-def my_theatres(user_details: dict = Depends(get_current_user), db: Session = Depends(get_db)):
-
+@seller_router.post("/add-theatre")
+def add_new_theatre(
+    theatre_data: TheatreCreate,
+    user_details: dict = Depends(get_current_seller),
+    db: Session = Depends(get_db)
+):
+    seller_id = user_details.id
     new_theatre = Theatre(
-        name=theatre.name,
-        seller_id=user_details.id,
-        seating_map=theatre.seating_map,
-        location=theatre.location,
-        capacity=theatre.capacity
+        name=theatre_data.name,
+        seller_id=seller_id,
+        seating_map=theatre_data.seating_map,
+        location=theatre_data.location,
+        capacity=theatre_data.capacity
     )
     db.add(new_theatre)
     db.commit()
     db.refresh(new_theatre)
-    return {"status": "1", "message": "Theatre created successfully"}
+
+    return {"status": "1", "message": "Theatre added successfully", "data": new_theatre}

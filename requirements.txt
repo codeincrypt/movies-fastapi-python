@@ -1,10 +1,11 @@
+email-validator
 fastapi
+jose
 uvicorn
 pydantic
-sqlalchemy
 python-dotenv
 passlib
 psycopg2
 PyJWT
-email-validator
 requests
+sqlalchemy
